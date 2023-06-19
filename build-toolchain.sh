@@ -18,18 +18,20 @@ build_llvm_clang() {
 		-DCMAKE_INSTALL_PREFIX:PATH=${TOOLCHAIN_INSTALL}/x86_64-linux-gnu/ \
 		-DLLVM_CCACHE_BUILD:BOOL=OFF \
 		-DLLVM_ENABLE_LLD:BOOL=ON \
+                -DCMAKE_ASM_FLAGS:STRING="-G0 -mlong-calls -fpic" \
 		-DLLVM_ENABLE_LIBCXX:BOOL=ON \
 		-DLLVM_ENABLE_TERMINFO:BOOL=OFF \
 		-DLLVM_ENABLE_ASSERTIONS:BOOL=ON \
-		-DLLVM_ENABLE_PIC:BOOL=OFF \
+		-DLLVM_ENABLE_PIC:BOOL=ON \
+                -DLLDB_INCLUDE_TESTS:BOOL=OFF \
 		-DLLVM_TARGETS_TO_BUILD:STRING="Hexagon" \
-		-DLLVM_PYTHON_EXECUTABLE:STRING=$(which python3.6) \
+		-DLLVM_PYTHON_EXECUTABLE:STRING=$(which python3) \
 		-DLLVM_DEFAULT_TARGET_TRIPLE:STRING="hexagon-unknown-musl-linux" \
 		-DCLANG_DEFAULT_CXX_STDLIB:STRING="libc++" \
 		-DCLANG_DEFAULT_OBJCOPY:STRING="llvm-objcopy" \
 		-DCLANG_DEFAULT_LINKER:STRING="lld" \
 		-DDEFAULT_SYSROOT:STRING="../target/hexagon-unknown-linux-musl/" \
-		-DLLVM_ENABLE_PROJECTS:STRING="clang;lld" \
+		-DLLVM_ENABLE_PROJECTS:STRING="clang;lld;lldb" \
 		../llvm-project/llvm
  	ninja all install
 	cd ${TOOLCHAIN_INSTALL}/x86_64-linux-gnu/bin
@@ -40,6 +42,7 @@ build_llvm_clang() {
 	ln -sf llvm-objcopy hexagon-unknown-linux-musl-objcopy
 	ln -sf llvm-readelf hexagon-unknown-linux-musl-readelf
 	ln -sf llvm-ranlib hexagon-unknown-linux-musl-ranlib
+        ln -sf lldb hexagon-unknown-linux-musl-lldb
 }
 
 build_clang_rt() {
@@ -209,7 +212,7 @@ build_qemu() {
 	CC=$(which gcc) \
 	../qemu/configure --disable-fdt --disable-capstone --disable-guest-agent \
 	                  --disable-containers \
-	                  --python=$(which python3.6) \
+	                  --python=$(which python3) \
 		--target-list=hexagon-linux-user --prefix=${TOOLCHAIN_INSTALL}/x86_64-linux-gnu \
 
 #	--cc=clang \
@@ -279,7 +282,7 @@ which clang
 clang --version
 ninja --version
 cmake --version
-python3.6 --version
+python3 --version
 
 build_llvm_clang
 ccache --show-stats

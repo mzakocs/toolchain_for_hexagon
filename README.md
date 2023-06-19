@@ -1,3 +1,5 @@
+version 16.0.5
+
 # Toolchain for Hexagon
 
 This repository contains scripts and recipes for building a cross toolchain for use with the [Hexagon DSP](https://developer.qualcomm.com/software/hexagon-dsp-sdk/dsp-processor).
